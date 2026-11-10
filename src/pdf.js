@@ -2,10 +2,10 @@ import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import puppeteer from 'puppeteer';
-import { buildHtml, fontFaceCss, PDF_OPTIONS } from './html.js';
+import { buildHtml, fontFaceCss, pdfOptions } from './html.js';
 
-// Local (Node) PDF renderer. The PDF is rendered by headless Chromium, because
-// it handles Persian letter shaping and right-to-left / mixed-direction text correctly.
+// Local preview renderer (used by test/make-sample.js): prints the same HTML
+// the Worker produces, with a locally installed headless Chrome.
 
 const require = createRequire(import.meta.url);
 const fontDir = path.join(
@@ -14,9 +14,8 @@ const fontDir = path.join(
   'webfonts',
 );
 
-let fontCssPromise;
-function fontCss() {
-  fontCssPromise ??= Promise.all(
+async function fontCss() {
+  const fonts = await Promise.all(
     [
       ['Regular', 400],
       ['Bold', 700],
@@ -24,38 +23,16 @@ function fontCss() {
       const data = await readFile(path.join(fontDir, `Vazirmatn-${name}.woff2`));
       return { weight, base64: data.toString('base64') };
     }),
-  ).then(fontFaceCss);
-  return fontCssPromise;
-}
-
-let browserPromise;
-function getBrowser() {
-  browserPromise ??= puppeteer
-    .launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
-    .then((browser) => {
-      browser.on('disconnected', () => {
-        browserPromise = undefined;
-      });
-      return browser;
-    })
-    .catch((err) => {
-      browserPromise = undefined;
-      throw err;
-    });
-  return browserPromise;
-}
-
-export async function closeBrowser() {
-  if (!browserPromise) return;
-  const browser = await browserPromise.catch(() => null);
-  await browser?.close();
+  );
+  return fontFaceCss(fonts);
 }
 
 /**
- * @param {Array<{type: 'text', text: string} | {type: 'image', data: Buffer, mime: string, caption?: string}>} items
+ * @param {Array<object>} items like buildHtml(), except images carry `data` (Buffer) and `mime`
+ * @param {{settings?: object, title?: string}} [options]
  * @returns {Promise<Buffer>}
  */
-export async function buildPdf(items) {
+export async function buildPdf(items, options = {}) {
   const html = buildHtml(
     items.map((item) =>
       item.type === 'image'
@@ -63,15 +40,16 @@ export async function buildPdf(items) {
         : item,
     ),
     await fontCss(),
+    options,
   );
 
-  const browser = await getBrowser();
-  const page = await browser.newPage();
+  const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
   try {
+    const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'load', timeout: 120_000 });
     await page.evaluate(() => document.fonts.ready);
-    return Buffer.from(await page.pdf(PDF_OPTIONS));
+    return Buffer.from(await page.pdf(pdfOptions(options.settings)));
   } finally {
-    await page.close();
+    await browser.close();
   }
 }

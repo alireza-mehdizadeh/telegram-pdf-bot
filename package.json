@@ -1,16 +1,16 @@
 {
   "name": "telegram-pdf-bot",
-  "version": "1.0.0",
-  "description": "Telegram bot that collects messages (text + images) and turns them into one PDF, with Persian/RTL support",
+  "version": "1.1.0",
+  "description": "Telegram bot on Cloudflare Workers that collects messages (text + images) and turns them into one PDF, with Persian/RTL support",
   "type": "module",
-  "main": "src/bot.js",
+  "main": "src/worker.js",
   "scripts": {
-    "setup": "puppeteer browsers install chrome",
-    "start": "node --env-file=.env src/bot.js",
-    "test:pdf": "node test/make-sample.js",
     "deploy": "wrangler deploy",
     "secrets": "wrangler secret bulk .env",
-    "webhook": "node --env-file=.env scripts/set-webhook.js"
+    "webhook": "node --env-file=.env scripts/set-webhook.js",
+    "logs": "wrangler tail",
+    "setup": "puppeteer browsers install chrome",
+    "test:pdf": "node test/make-sample.js"
   },
   "engines": {
     "node": ">=20.6"
@@ -18,10 +18,10 @@
   "dependencies": {
     "@cloudflare/puppeteer": "^1.4.0",
     "grammy": "^1.30.0",
-    "puppeteer": "^24.0.0",
     "vazirmatn": "^33.0.3"
   },
   "devDependencies": {
+    "puppeteer": "^24.0.0",
     "wrangler": "^4.159.0"
   }
 }
