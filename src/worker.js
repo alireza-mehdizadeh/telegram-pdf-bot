@@ -1,4 +1,5 @@
 import { Bot, webhookCallback } from 'grammy';
+import { registerAccess } from './admin.js';
 import { settingsKeyboard } from './settings.js';
 import {
   CANCEL,
@@ -16,6 +17,8 @@ import {
 // Collected messages live in a per-chat Durable Object (src/session.js),
 // which also builds and sends the PDF.
 export { ChatSession } from './session.js';
+// Who may use the bot (src/admin.js holds the request flow and admin panel).
+export { AccessList } from './access.js';
 
 // Name shown in the optional "sender & time" line: the original author for
 // forwarded messages, otherwise whoever sent the message to the bot.
@@ -101,6 +104,9 @@ function createBot(env) {
     const current = await session(ctx).getSettings();
     return ctx.reply(TEXT.settings, { reply_markup: settingsKeyboard(current) });
   }
+
+  // First: everything below only runs for the admin and approved users.
+  registerAccess(bot, env);
 
   bot.command('start', start);
   bot.command('done', finish);

@@ -6,13 +6,22 @@
   "compatibility_flags": ["nodejs_compat"],
   // Headless Chrome that renders the PDF.
   "browser": { "binding": "BROWSER" },
-  // One ChatSession per Telegram chat holds the collected messages.
   "durable_objects": {
-    "bindings": [{ "name": "CHATS", "class_name": "ChatSession" }]
+    "bindings": [
+      // One ChatSession per Telegram chat holds the collected messages.
+      { "name": "CHATS", "class_name": "ChatSession" },
+      // A single AccessList holds the admin, the allowed users and the wait list.
+      { "name": "ACCESS", "class_name": "AccessList" }
+    ]
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ChatSession"] }],
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["ChatSession"] },
+    { "tag": "v2", "new_sqlite_classes": ["AccessList"] }
+  ],
   // Bundle the Persian font files as binary data.
   "rules": [{ "type": "Data", "globs": ["**/*.woff2"], "fallthrough": true }],
   "observability": { "enabled": true }
-  // Secrets (set with `npm run secrets`): BOT_TOKEN, WEBHOOK_SECRET
+  // Nothing private lives in this file. BOT_TOKEN, WEBHOOK_SECRET and
+  // ADMIN_USERNAME are Worker secrets: put them in .env (see .env.example)
+  // and upload them with `npm run secrets`.
 }

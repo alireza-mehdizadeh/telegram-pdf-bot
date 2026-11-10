@@ -32,7 +32,24 @@ export const COMMANDS = [
   { command: 'help', description: 'راهنما / Help' },
 ];
 
+// Added to the admin's own command menu only.
+export const ADMIN_COMMAND = { command: 'admin', description: 'مدیریت کاربران / Manage users' };
+
 export const TEXT = {
+  privateBot:
+    '🔒 این ربات خصوصی است. برای استفاده، درخواست دسترسی بفرستید.\n' +
+    'This bot is private. Send an access request to use it.',
+  requestSent:
+    '📨 درخواست شما فرستاده شد. پس از تأیید مدیر به شما خبر می‌دهم.\n' +
+    'Your request was sent. I will tell you when the admin approves it.',
+  requestWaiting: '⏳ درخواست شما در انتظار تأیید مدیر است.\nYour request is waiting for the admin.',
+  accessGranted:
+    '✅ دسترسی شما تأیید شد. برای شروع /start را بزنید.\nYou now have access. Send /start to begin.',
+  accessDenied: '🚫 شما به این ربات دسترسی ندارید.\nYou do not have access to this bot.',
+  newRequest: (who) => `📨 درخواست دسترسی جدید / New access request\n${who}`,
+  adminPanel:
+    '🛠 مدیریت کاربران — یک فهرست را باز کنید.\nUser management — open a list to approve, deny or remove people.',
+  adminEmptyList: '— خالی / empty —',
   welcome:
     'سلام! هر پیامی (متن یا عکس) بفرستید جمع می‌شود. در پایان «Done» را بزنید تا همه در یک PDF ساخته شود.\n\n' +
     'Send me text and photos. When you are finished, press “Done” and I will put everything into one PDF.\n\n' +

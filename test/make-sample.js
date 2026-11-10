@@ -34,7 +34,7 @@ const items = [
   {
     type: 'text',
     text: 'سلام دنیا! این یک پیام آزمایشی به زبان فارسی است.\nخط دوم با عدد ۱۲۳۴ و کلمهٔ English در وسط جمله.',
-    from: 'علیرضا',
+    from: 'سارا',
     date,
   },
   {
@@ -58,16 +58,16 @@ const items = [
       entity(formatted, 'const x = 1;\nconsole.log(x);', 'pre'),
       entity(formatted, 'npm start', 'code'),
     ],
-    from: 'علیرضا',
+    from: 'سارا',
     date: date + 120,
   },
   {
     type: 'text',
     text: 'This is a plain English message.\n\nWith a blank line and <b>html</b> & symbols.',
-    from: 'Alireza',
+    from: 'Sara',
     date: date + 180,
   },
-  { type: 'image', data: image, mime: 'image/png', from: 'Alireza', date: date + 240 },
+  { type: 'image', data: image, mime: 'image/png', from: 'Sara', date: date + 240 },
 ];
 
 const outputs = {
