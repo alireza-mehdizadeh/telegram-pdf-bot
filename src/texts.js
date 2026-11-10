@@ -65,6 +65,7 @@ export const TEXT = {
     '/status — تعداد پیام‌های جمع‌شده / what is collected\n' +
     '/settings — اندازه صفحه، متن، عکس، شماره صفحه… / page, text and image options\n' +
     '/cancel — لغو / discard everything',
+  error: '⚠️ مشکلی پیش آمد؛ دوباره تلاش کنید.\nSomething went wrong — please try again.',
   startFirst: 'ابتدا /start را بزنید.\nSend /start first.',
   empty: 'هنوز پیامی نفرستاده‌اید.\nNothing to put in the PDF yet — send some messages first.',
   building: '⏳ در حال ساخت PDF…',

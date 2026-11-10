@@ -105,7 +105,20 @@ function createBot(env) {
     return ctx.reply(TEXT.settings, { reply_markup: settingsKeyboard(current) });
   }
 
-  // First: everything below only runs for the admin and approved users.
+  // Outermost: log handler errors instead of letting them escape. An escaped
+  // error makes the Worker answer 500, and Telegram then re-sends that same
+  // update over and over, holding back every later message. (bot.catch does
+  // not apply here: it only covers long polling, not webhooks.)
+  bot.use(async (ctx, next) => {
+    try {
+      await next();
+    } catch (err) {
+      console.error(`Update ${ctx.update.update_id} failed:`, err?.stack ?? err);
+      await ctx.reply(TEXT.error).catch(() => {});
+    }
+  });
+
+  // Everything below only runs for the admin and approved users.
   registerAccess(bot, env);
 
   bot.command('start', start);
@@ -126,9 +139,9 @@ function createBot(env) {
   bot.callbackQuery(/^set:(\w+)$/, async (ctx) => {
     const updated = await session(ctx).cycleSetting(ctx.match[1]);
     await ctx.editMessageReplyMarkup({ reply_markup: settingsKeyboard(updated) }).catch(() => {});
-    return ctx.answerCallbackQuery();
+    return ctx.answerCallbackQuery().catch(() => {});
   });
-  bot.on('callback_query', (ctx) => ctx.answerCallbackQuery());
+  bot.on('callback_query', (ctx) => ctx.answerCallbackQuery().catch(() => {}));
 
   bot.on('message:text', (ctx) => {
     // A mistyped command should not end up in the PDF.
@@ -147,7 +160,6 @@ function createBot(env) {
   });
   bot.on('message', (ctx) => ctx.reply(TEXT.unsupported));
 
-  bot.catch((err) => console.error('Bot error:', err.error ?? err));
   return bot;
 }
 

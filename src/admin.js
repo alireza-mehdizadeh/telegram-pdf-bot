@@ -26,10 +26,12 @@ const button = (text, data) => ({ text, callback_data: data });
 
 /** Must be registered before every other handler. */
 export function registerAccess(bot, env) {
-  const registry = env.ACCESS.get(env.ACCESS.idFromName('registry'));
+  // A fresh handle per call: the bot object is reused across requests, and
+  // Cloudflare forbids using a storage handle made in one request from another.
+  const registry = () => env.ACCESS.get(env.ACCESS.idFromName('registry'));
 
   async function panel() {
-    const counts = await registry.counts();
+    const counts = await registry().counts();
     return {
       text: TEXT.adminPanel,
       reply_markup: {
@@ -41,7 +43,7 @@ export function registerAccess(bot, env) {
   }
 
   async function listView(status) {
-    const users = await registry.list(status);
+    const users = await registry().list(status);
     const shown = users.slice(0, LIST_LIMIT);
     const lines = shown.map((user, i) => `${i + 1}. ${describe(user)}`);
     if (users.length > shown.length) lines.push(`… +${users.length - shown.length}`);
@@ -64,7 +66,7 @@ export function registerAccess(bot, env) {
 
   bot.use(async (ctx, next) => {
     if (!ctx.from || ctx.from.is_bot) return;
-    const { role, bound } = await registry.check(profile(ctx.from), env.ADMIN_USERNAME);
+    const { role, bound } = await registry().check(profile(ctx.from), env.ADMIN_USERNAME);
     ctx.role = role;
     if (bound) {
       // Only the admin sees /admin in their command menu.
@@ -75,9 +77,10 @@ export function registerAccess(bot, env) {
     if (role === 'admin' || role === 'approved') return next();
 
     // Not allowed (yet): the only thing they can do is ask for access.
+    // (Acknowledging a tap fails if the tap is old; that must not stop the rest.)
     if (ctx.callbackQuery?.data === 'req') {
-      const result = await registry.request(profile(ctx.from));
-      await ctx.answerCallbackQuery();
+      const result = await registry().request(profile(ctx.from));
+      await ctx.answerCallbackQuery().catch(() => {});
       await ctx.editMessageText(result.status === 'denied' ? TEXT.accessDenied : TEXT.requestSent).catch(() => {});
       if (result.created && result.adminId) {
         const user = profile(ctx.from);
@@ -96,7 +99,7 @@ export function registerAccess(bot, env) {
       }
       return;
     }
-    if (ctx.callbackQuery) return ctx.answerCallbackQuery();
+    if (ctx.callbackQuery) return ctx.answerCallbackQuery().catch(() => {});
     if (ctx.chat?.type !== 'private') return;
     if (role === 'pending') return ctx.reply(TEXT.requestWaiting);
     if (role === 'denied') return ctx.reply(TEXT.accessDenied);
@@ -112,16 +115,16 @@ export function registerAccess(bot, env) {
   });
 
   bot.callbackQuery(/^adm:/, async (ctx) => {
-    if (ctx.role !== 'admin') return ctx.answerCallbackQuery();
+    if (ctx.role !== 'admin') return ctx.answerCallbackQuery().catch(() => {});
     const [, action, a, b, c] = ctx.callbackQuery.data.split(':');
-    await ctx.answerCallbackQuery();
+    await ctx.answerCallbackQuery().catch(() => {});
 
     if (action === 'home') return show(ctx, await panel());
     if (action === 'list' && a in LISTS) return show(ctx, await listView(a));
     if (action !== 'set' || !['approved', 'denied'].includes(a)) return;
 
     // adm:set:<new status>:<user id>:<list to go back to, or "notice">
-    const user = await registry.setStatus(Number(b), a);
+    const user = await registry().setStatus(Number(b), a);
     if (user) {
       await ctx.api
         .sendMessage(user.id, a === 'approved' ? TEXT.accessGranted : TEXT.accessDenied)
