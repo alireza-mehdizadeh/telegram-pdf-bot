@@ -1,0 +1,20 @@
+{
+  "name": "telegram-pdf-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot that collects messages (text + images) and turns them into one PDF, with Persian/RTL support",
+  "type": "module",
+  "main": "src/bot.js",
+  "scripts": {
+    "setup": "puppeteer browsers install chrome",
+    "start": "node --env-file=.env src/bot.js",
+    "test:pdf": "node test/make-sample.js"
+  },
+  "engines": {
+    "node": ">=20.6"
+  },
+  "dependencies": {
+    "grammy": "^1.30.0",
+    "puppeteer": "^24.0.0",
+    "vazirmatn": "^33.0.3"
+  }
+}
