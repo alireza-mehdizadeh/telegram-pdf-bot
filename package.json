@@ -7,14 +7,21 @@
   "scripts": {
     "setup": "puppeteer browsers install chrome",
     "start": "node --env-file=.env src/bot.js",
-    "test:pdf": "node test/make-sample.js"
+    "test:pdf": "node test/make-sample.js",
+    "deploy": "wrangler deploy",
+    "secrets": "wrangler secret bulk .env",
+    "webhook": "node --env-file=.env scripts/set-webhook.js"
   },
   "engines": {
     "node": ">=20.6"
   },
   "dependencies": {
+    "@cloudflare/puppeteer": "^1.4.0",
     "grammy": "^1.30.0",
     "puppeteer": "^24.0.0",
     "vazirmatn": "^33.0.3"
+  },
+  "devDependencies": {
+    "wrangler": "^4.159.0"
   }
 }

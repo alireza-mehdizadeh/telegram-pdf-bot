@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "telegram-pdf-bot",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Headless Chrome that renders the PDF.
+  "browser": { "binding": "BROWSER" },
+  // One ChatSession per Telegram chat holds the collected messages.
+  "durable_objects": {
+    "bindings": [{ "name": "CHATS", "class_name": "ChatSession" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ChatSession"] }],
+  // Bundle the Persian font files as binary data.
+  "rules": [{ "type": "Data", "globs": ["**/*.woff2"], "fallthrough": true }],
+  "observability": { "enabled": true }
+  // Secrets (set with `npm run secrets`): BOT_TOKEN, WEBHOOK_SECRET
+}
