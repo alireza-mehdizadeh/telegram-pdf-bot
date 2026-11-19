@@ -1,8 +1,8 @@
 import { DurableObject } from 'cloudflare:workers';
 import { Buffer } from 'node:buffer';
 import puppeteer from '@cloudflare/puppeteer';
-import regularFont from 'vazirmatn/fonts/webfonts/Vazirmatn-Regular.woff2';
-import boldFont from 'vazirmatn/fonts/webfonts/Vazirmatn-Bold.woff2';
+import regularFont from '../fonts/Vazirmatn-Regular.woff2';
+import boldFont from '../fonts/Vazirmatn-Bold.woff2';
 import { buildHtml, fontFaceCss, pdfOptions } from './html.js';
 import { nextValue, normalizeSettings, SETTINGS } from './settings.js';
 import { COLLECTING_KEYBOARD, MAX_ITEMS, TEXT } from './texts.js';

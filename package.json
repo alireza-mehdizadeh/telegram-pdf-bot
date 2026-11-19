@@ -10,18 +10,19 @@
     "webhook": "node --env-file=.env scripts/set-webhook.js",
     "logs": "wrangler tail",
     "setup": "puppeteer browsers install chrome",
-    "test:pdf": "node test/make-sample.js"
+    "test:pdf": "node test/make-sample.js",
+    "fonts": "python3 scripts/build-fonts.py"
   },
   "engines": {
     "node": ">=20.6"
   },
   "dependencies": {
     "@cloudflare/puppeteer": "^1.4.0",
-    "grammy": "^1.30.0",
-    "vazirmatn": "^33.0.3"
+    "grammy": "^1.30.0"
   },
   "devDependencies": {
     "puppeteer": "^24.0.0",
+    "vazirmatn": "^33.0.3",
     "wrangler": "^4.159.0"
   }
 }

@@ -169,11 +169,19 @@ export function buildHtml(items, fontCss, { settings, title } = {}) {
     text-align: start;
   }
   section, figure { margin: 0 0 18pt; }
-  figure { break-inside: avoid; text-align: center; }
+  /* "One per page": every message starts on a new page. */
+  body.per-page > section:not(:last-child),
+  body.per-page > figure:not(:last-child) { break-after: page; }
+  figure { break-inside: avoid; }
+  /* Images are stretched to the chosen width, even small ones. A very tall
+     image is shrunk to fit the page instead, centred in that width. */
   figure img {
-    max-width: ${IMAGE_WIDTH[s.image]};
+    display: block;
+    width: ${IMAGE_WIDTH[s.image]};
+    height: auto;
     max-height: ${maxImageHeight}mm;
-    border-radius: 4pt;
+    margin: 0 auto;
+    object-fit: contain;
   }
   figcaption { margin-top: 8pt; }
   .info {
@@ -211,7 +219,7 @@ export function buildHtml(items, fontCss, { settings, title } = {}) {
   }
 </style>
 </head>
-<body>${heading}${items.map((item) => itemHtml(item, s.info === 'on')).join('\n')}</body>
+<body class="${s.layout === 'page' ? 'per-page' : ''}">${heading}${items.map((item) => itemHtml(item, s.info === 'on')).join('\n')}</body>
 </html>`;
 }
 

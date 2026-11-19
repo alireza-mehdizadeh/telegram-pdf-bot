@@ -6,6 +6,10 @@ export const SETTINGS = {
     label: '📄 صفحه / Page',
     values: { A4: 'A4', A5: 'A5', Letter: 'Letter' },
   },
+  layout: {
+    label: '📑 چیدمان / Layout',
+    values: { flow: 'پشت سر هم / Continuous', page: 'هر پیام یک صفحه / One per page' },
+  },
   orientation: {
     label: '🔄 جهت / Orientation',
     values: { portrait: 'عمودی / Portrait', landscape: 'افقی / Landscape' },

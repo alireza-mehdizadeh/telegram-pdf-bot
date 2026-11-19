@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import puppeteer from 'puppeteer';
 import { buildHtml, fontFaceCss, pdfOptions } from './html.js';
@@ -7,12 +7,8 @@ import { buildHtml, fontFaceCss, pdfOptions } from './html.js';
 // Local preview renderer (used by test/make-sample.js): prints the same HTML
 // the Worker produces, with a locally installed headless Chrome.
 
-const require = createRequire(import.meta.url);
-const fontDir = path.join(
-  path.dirname(require.resolve('vazirmatn/package.json')),
-  'fonts',
-  'webfonts',
-);
+// Copy-safe fonts, built by scripts/build-fonts.py.
+const fontDir = fileURLToPath(new URL('../fonts/', import.meta.url));
 
 async function fontCss() {
   const fonts = await Promise.all(

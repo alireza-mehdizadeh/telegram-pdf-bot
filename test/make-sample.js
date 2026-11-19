@@ -7,9 +7,9 @@ import { buildPdf } from '../src/pdf.js';
 // Make a sample image with the same headless browser.
 const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
 const page = await browser.newPage();
-await page.setViewport({ width: 800, height: 450 });
+await page.setViewport({ width: 400, height: 225 });
 await page.setContent(
-  '<body style="margin:0;height:100vh;background:linear-gradient(135deg,#2b6cb0,#9f7aea);display:grid;place-items:center;font:60px sans-serif;color:#fff">Sample image</body>',
+  '<body style="margin:0;height:100vh;background:linear-gradient(135deg,#2b6cb0,#9f7aea);display:grid;place-items:center;font:30px sans-serif;color:#fff">Sample image</body>',
 );
 const image = Buffer.from(await page.screenshot({ type: 'png' }));
 await browser.close();
@@ -74,7 +74,7 @@ const outputs = {
   'sample.pdf': {},
   'sample-options.pdf': {
     title: 'گزارش هفتگی — Weekly report',
-    settings: { page: 'A5', orientation: 'landscape', font: 'large', image: 'medium', numbers: 'on', info: 'on' },
+    settings: { page: 'A5', orientation: 'landscape', font: 'large', layout: 'page', image: 'medium', numbers: 'on', info: 'on' },
   },
 };
 
